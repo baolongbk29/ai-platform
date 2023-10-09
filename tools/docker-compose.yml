@@ -1,6 +1,8 @@
 version: '3.5'
 
 services:
+
+  #Database
   postgres:
     container_name: postgres_container
     image: postgres
@@ -9,17 +11,103 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-qksiowc294mcmqjw}
       PGDATA: /data/postgres
     volumes:
-       - postgres:/data/postgres
+       - ./postgres:/data/postgres
     ports:
       - "5432:5432"
     networks:
       - postgres
     restart: unless-stopped
-    
+  
+  #Redis
+    # Redis
+  redis:
+    image: redis
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --requirepass password
+    volumes:
+      - ./redis/redis-data:/data
+    ports:
+     - 6379:6379
+    networks:
+     - mlnet
+  
+  # Rabbitmq   
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest 
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - ./rabbit-mq/rabbitmq-data:/var/lib/rabbitmq/
+      - ./rabbit-mq/rabbitmq-logs:/var/log/rabbitmq
+    networks:
+      - mlnet
+  
+  # # MONITOR
+  # flower:
+  #   image: fast-api-celery-custom
+  #   container_name: celery-flower
+  #   networks:
+  #     - production-boilerplate
+  #   environment:
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+  #     - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}
+  #   command: ./starter.sh --target flower
+  #   ports:
+  #     - "5555:5555"
+  #   depends_on:
+  #     - redis
+  #     - rabbitmq
+  #     - celery
+
+  # # WORKER
+  # celery:
+  #   build:
+  #     context: ./app
+  #     dockerfile: Dockerfile.custom
+  #   image: fast-api-celery-custom
+  #   container_name: celery-worker
+  #   networks:
+  #     - production-boilerplate
+  #   environment:
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+  #     - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}
+  #     - CELERY_QUEUE=${CELERY_QUEUE}
+  #   command: ./starter.sh --target worker
+  #   depends_on:
+  #     - redis
+  #     - rabbitmq
+
+  # # API
+  # fastapi:
+  #   image: fast-api-celery-custom
+  #   container_name: fastapi
+  #   networks:
+  #     - production-boilerplate
+  #   environment:
+  #     - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+  #     - CELERY_BACKEND_URL=${CELERY_BACKEND_URL}
+  #   command: ./starter.sh --target fastapi
+  #   ports:
+  #     - "8000:80"
+  #   depends_on:
+  #     - redis
+  #     - rabbitmq
+  #     - celery
+
+
 networks:
   postgres:
+    driver: bridge
+  mlnet:
     driver: bridge
 
 volumes:
     postgres:
-    pgadmin:
+    rabbit-mq:
+    redis:

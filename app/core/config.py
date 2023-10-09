@@ -4,11 +4,17 @@ from pathlib import Path
 from dotenv import load_dotenv
 import logging
 
-load_dotenv(r"E:\BaoLong\ecommerce-platform\.env")
+import configparser
+import datetime
+import pytz 
+
+
+cfg = configparser.ConfigParser()
+cfg.read(r'E:\BaoLong\ecommerce-platform\environment.ini')
 
 class BaseConfig:
     # base
-    ENV: str = "dev"
+    ENV: str = cfg['project']['environment']
     APP_ROOT_DIR: str = Path(__file__).parent.parent.parent
     TEST_DATA_DIR: str = os.path.join(APP_ROOT_DIR, "tests", "data")
     PROJECT_NAME: str = "fastapi-ecommerce-platform"
@@ -31,15 +37,46 @@ class BaseConfig:
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
 
     # database
-    DB: str = os.getenv("DB", "postgresql")
-    DB_USER: str = os.getenv("DB_USER")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD")
-    DB_HOST: str = os.getenv("DB_HOST")
-    DB_PORT: str = os.getenv("DB_PORT", "3306")
-    DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/dev"
-    SYNC_DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/dev"
+    DATABASE=cfg['database']
+    DB: str = DATABASE['database']
+    DB_USER: str = DATABASE['user']
+    DB_PASSWORD: str = DATABASE['pass']
+    DB_HOST: str = DATABASE['host']
+    DB_PORT: str = DATABASE['port']
+    DB_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB}"
+    SYNC_DB_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB}"
     print(DB)
+    #=========================================================================
+    #                          REDIS INFORMATION 
+    #=========================================================================
+    REDIS = cfg['redis']
+    REDIS_BACKEND = "redis://:{password}@{hostname}:{port}/{db}".format(
+        hostname=REDIS['host'],
+        password=REDIS['pass'],
+        port=REDIS['port'],
+        db=REDIS['db']
+    )
 
+    #=========================================================================
+    #                          BROKER INFORMATION 
+    #=========================================================================
+    RABBITMQ = cfg['rabbitmq']
+    BROKER = "amqp://{user}:{pw}@{hostname}:{port}/{vhost}".format(
+        user=RABBITMQ['user'],
+        pw=RABBITMQ['pass'],
+        hostname=RABBITMQ['host'],
+        port=RABBITMQ['post'],
+        vhost=RABBITMQ['vhost']
+    )
+    #=========================================================================
+    #                          ML INFORMATION 
+    #=========================================================================
+    ML = cfg['ml']
+    ML_IMAGE_TYPE = ML['image_type']
+    ML_STORAGE_PATH = ML['storage_path']
+    ML_STORAGE_UPLOAD_PATH = ML['storage_upload_path']
+    ML_OBJECT_DETECTION_TASK = ML['object_detection_task']
+    ML_QUERY_NAME = ML['query_name']
 
 
 class TestConfig(BaseConfig):
