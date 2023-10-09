@@ -81,5 +81,5 @@ ML = cfg["ml"]
 MODEL_PATH = ML['model_path']
 LABLE_PATH = ML['label_path']
 
-NMS_THRESHOLD = float(ML['iou_threshold'])
+IOU_THRESHOLD = float(ML['iou_threshold'])
 SCORE_THRESHOLD = float(ML['score_threshold'])
