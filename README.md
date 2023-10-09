@@ -1,8 +1,8 @@
 # ecommerce-platform
 ### User
-- [ ] signup
+- [X] signup
 - [ ] nickname duplication check
-- [ ] signin
-- [ ] change password
-- [ ] change profile
-- [ ] issue refresh token and refresh access token
+- [X] signin
+- [X] change password
+- [X] change profile
+- [X] issue refresh token and refresh access token
