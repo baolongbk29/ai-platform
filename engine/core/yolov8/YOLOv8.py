@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import onnxruntime
 
-from yolov8.utils import xywh2xyxy, draw_detections, multiclass_nms
+from engine.core.yolov8.utils import xywh2xyxy, draw_detections, multiclass_nms
 
 
 class YOLOv8:
@@ -20,7 +20,7 @@ class YOLOv8:
 
     def initialize_model(self, path):
         self.session = onnxruntime.InferenceSession(path,
-                                                    providers=onnxruntime.get_available_providers())
+                                                    providers=['CPUExecutionProvider'])
         # Get model info
         self.get_input_details()
         self.get_output_details()
@@ -42,7 +42,7 @@ class YOLOv8:
         # input_img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
         # Resize input image
-        input_img = cv2.resize(input_img, (self.input_width, self.input_height))
+        input_img = cv2.resize(image, (self.input_width, self.input_height))
 
         # Scale input pixel values to 0 to 1
         input_img = input_img / 255.0

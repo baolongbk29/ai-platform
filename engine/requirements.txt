@@ -1,0 +1,7 @@
+# fastapi
+# psycopg2-binary==2.8.6
+celery==5.1.2
+flower==1.0.0
+redis==3.5.3
+SQLAlchemy==1.4.23
+starlette==0.16.0

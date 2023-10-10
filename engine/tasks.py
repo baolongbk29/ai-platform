@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import cv2
@@ -8,9 +9,9 @@ from engine.core.init_redis import is_backend_running
 from engine.core import config
 from engine.core.mq_main import redis
 
-from engine.core.yolov8 import YOLOv8
+from engine.core.yolov8 import YOLOv8, utils
 from engine.core import config
-from utils import helpers
+from engine.utils import helpers
 
 
 if not is_backend_running(): exit()
@@ -18,7 +19,7 @@ if not is_broker_running(): exit()
 
 
 app = Celery(config.QUERY_NAME, broker=config.BROKER, backend=config.REDIS_BACKEND)
-app.config_from_object('settings.celery_config')
+app.config_from_object('engine.core.config')
 
 
 class PredictTask(Task):
@@ -38,7 +39,7 @@ class PredictTask(Task):
         """
         if not self.model:
             logging.info('Loading Model...')
-            self.model = YOLOv8(config.MODEL_PATH, conf_thres=config.SCORE_THRESHOLD, iou_thres=config.IOU_THRESHOLD)
+            self.model = YOLOv8.YOLOv8(config.MODEL_PATH, conf_thres=config.SCORE_THRESHOLD, iou_thres=config.IOU_THRESHOLD)
             logging.info('Model loaded')
         return self.run(*args, **kwargs)
     
@@ -66,24 +67,20 @@ def object_detection_task(self, task_id: str, data: bytes):
         image_draw = image.copy()
         height, width = image.shape[0:2]
         # Detect Objects
-        detection_boxes,detection_scores, detection_classes = self.model(image)
+        detection_boxes, detection_scores, detection_classes = self.model(image)
+        # Draw detections
+        combined_img = self.model.draw_detections(image)
         det_new = []
-        class_name_color = (0,255,0)
-        box_color = (0,255,0)
         for j in range(len(detection_boxes)):
             box = detection_boxes[j]
             ymin, xmin, ymax, xmax = int(box[0]*height), int(box[1]*width), int(box[2]*height), int(box[3]*width)
             obj = {}
             obj['confidence_level'] = str(detection_scores[j])
             obj['box'] = ",".join([str(xmin), str(ymin), str(xmax), str(ymax)])
-            # obj['class_name'] = category_index[detection_classes[j]]['name']
-            det_new.append(obj)
-            image_draw = cv2.rectangle(image_draw, (xmin, ymin), (xmax, ymax), box_color, 1)
-            cv2.putText(image_draw, str(detection_classes[j]), (xmin+5, ymin+20), cv2.FONT_HERSHEY_SIMPLEX, 0.9, class_name_color, 2)
-        # data['detection_draw_url'] = "http://{}:{}/api/v1/show-image/?path_image=".format(config.BE_HOST, config.BE_PORT) \
-        #     + celery_config.ML_STORAGE_OBJECT_DETECTION_PATH + string_time + '/' + str(task_id) + celery_config.ML_IMAGE_TYPE
-        # create_path(celery_config.ML_STORAGE_OBJECT_DETECTION_PATH + string_time)
-        cv2.imwrite(config.ML_STORAGE_OBJECT_DETECTION_PATH + string_time + '/' + str(task_id) + config.ML_IMAGE_TYPE, image_draw)
+            obj['class_name'] = utils.class_names[detection_classes[j]]
+        data['detection_draw_url'] = config.ML_STORAGE_RESULTS_PATH + string_time + '/' + str(task_id) + config.ML_IMAGE_TYPE
+        helpers.create_path(os.path.join(config.ML_STORAGE_RESULTS_PATH + string_time))
+        cv2.imwrite(config.ML_STORAGE_RESULTS_PATH + string_time + '/' + str(task_id) + config.ML_IMAGE_TYPE, cv2.cvtColor(combined_img, cv2.COLOR_RGB2BGR))
         data['time']['end_detection'] = str(helpers.now_utc().timestamp())
         data['status']['detection_status'] = "SUCCESS"
         if len(det_new) > 0:

@@ -4,7 +4,7 @@ import pytz
 from kombu import Queue
 
 cfg = configparser.ConfigParser()
-cfg.read('./environment.ini')
+cfg.read(r'E:\BaoLong\ecommerce-platform\engine\engine_enviroment.ini')
 
 
 #=========================================================================
@@ -69,7 +69,7 @@ result_expires = 60 * 60 * 48  # 48 hours in seconds
 ML_OBJECT_DETECTION_TASK_NAME = CELERY['object_detection_task']
 ML_STORAGE_PATH = CELERY['storage_path']
 ML_STORAGE_UPLOAD_PATH = CELERY['storage_upload_path']
-ML_STORAGE_OBJECT_DETECTION_PATH = CELERY['storage_object_detection_path']
+ML_STORAGE_RESULTS_PATH = CELERY['storage_results_path']
 ML_IMAGE_TYPE = CELERY['image_type']
 
 

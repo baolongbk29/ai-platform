@@ -10,7 +10,7 @@ import pytz
 
 
 cfg = configparser.ConfigParser()
-cfg.read(r'E:\BaoLong\ecommerce-platform\environment.ini')
+cfg.read(r'E:\BaoLong\ecommerce-platform\app\environment.ini')
 
 class BaseConfig:
     # base

@@ -1,15 +1,10 @@
-from kombu import Connection
-from kombu.exceptions import OperationalError
+from redis import Redis
 from engine.core import config
 
 
-def is_broker_running(retries: int = 3) -> bool:
-    try:
-        conn = Connection(config.BROKER)
-        conn.ensure_connection(max_retries=retries)
-    except OperationalError as e:
-        print("Failed to connect to RabbitMQ instance at %s", config.BROKER)
-        print(str(e))
-        return False
-    conn.close()
-    return True
+redis = Redis(
+    host=config.REDIS['host'], 
+    port=config.REDIS['port'], 
+    password=config.REDIS['pass'],
+    db= config.REDIS['db']
+)
