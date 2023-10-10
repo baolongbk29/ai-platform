@@ -13,7 +13,7 @@ from app.utils import helpers
 from app.core.config import configs
 from app.models.engine import MlTimeHandle, MlResult, MlStatusHandle, MlResponse
 from app.utils.background import image_upload_background
-
+from app.core.dependency import get_current_active_user_token
 
 router = APIRouter(    
     prefix="/engine",
@@ -21,12 +21,13 @@ router = APIRouter(
 )
 
 
-@router.post("/process")
-async def ml_process(
+@router.post("/process",)
+async def engine_process(
     *,
     # current_user = Depends(token_helper.get_current_user),
     file: UploadFile = File(...),
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    user_token: str = Depends(get_current_active_user_token),
 ):
     if file.content_type not in ["image/jpeg", "image/png"]:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="file_type not support!")
@@ -41,10 +42,10 @@ async def ml_process(
 
 
 @router.get("/status/{task_id}", response_model=MlResult)
-def ml_status(
+def engine_status(
     *,
     task_id: str,
-    # current_user = Depends(token_helper.get_current_user),
+    user_token: str = Depends(get_current_active_user_token),
 ):
     data = redis.get(task_id)
     if data == None:

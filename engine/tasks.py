@@ -78,6 +78,7 @@ def object_detection_task(self, task_id: str, data: bytes):
             obj['confidence_level'] = str(detection_scores[j])
             obj['box'] = ",".join([str(xmin), str(ymin), str(xmax), str(ymax)])
             obj['class_name'] = utils.class_names[detection_classes[j]]
+            det_new.append(obj)
         data['detection_draw_url'] = config.ML_STORAGE_RESULTS_PATH + string_time + '/' + str(task_id) + config.ML_IMAGE_TYPE
         helpers.create_path(os.path.join(config.ML_STORAGE_RESULTS_PATH + string_time))
         cv2.imwrite(config.ML_STORAGE_RESULTS_PATH + string_time + '/' + str(task_id) + config.ML_IMAGE_TYPE, cv2.cvtColor(combined_img, cv2.COLOR_RGB2BGR))
