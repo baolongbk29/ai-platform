@@ -1,4 +1,4 @@
-# ecommerce-platform
+# AI-platform
 
 ### User
 - [X] signup
