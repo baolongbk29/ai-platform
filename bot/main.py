@@ -24,7 +24,7 @@ async def main():
 
     while True:
         response = await consumer.consume_stream(stream_channel="message_channel", count=1, block=0)
-
+        
         if response:
             for stream, messages in response:
                 # Get message from stream, and extract token, message data and message id
@@ -41,16 +41,16 @@ async def main():
 
                     await cache.add_message_to_cache(token=token, source="human", message_data=msg.dict())
 
-                    # Get chat history from cache
-                    data = await cache.get_chat_history(token=token)
+                    # # Get chat history from cache
+                    # data = await cache.get_chat_history(token=token)
+                    # print(data)
+                    # # Clean message input and send to query
+                    # message_data = data['messages'][-4:]
 
-                    # Clean message input and send to query
-                    message_data = data['messages'][-4:]
+                    # input = ["" + i['msg'] for i in message_data]
+                    # input = " ".join(input)
 
-                    input = ["" + i['msg'] for i in message_data]
-                    input = " ".join(input)
-
-                    res = GPT2_Medium_VN().query(input=input[7:])
+                    res = GPT2_Medium_VN().query(message)
 
                     msg = Message(
                         msg=res
