@@ -16,7 +16,9 @@ def resolve_table_name(name: str) -> str:
 class BaseTableModel:
     id: Column = Column(Integer, primary_key=True, index=True)
     created_at: Column = Column(DateTime, default=datetime.utcnow)
-    updated_at: Column = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Column = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Generate __tablename__ automatically
     @declared_attr
@@ -45,8 +47,12 @@ class CustomPydanticBaseModel(BaseModel):
 
 class ModelBaseInfoDto(CustomPydanticBaseModel):
     id: int = Field(default=None, description="id", example=1)
-    created_at: datetime = Field(default=None, description="created_at", example="2020-01-01 00:00:00")
-    updated_at: datetime = Field(default=None, description="updated_at", example="2020-01-01 00:00:00")
+    created_at: datetime = Field(
+        default=None, description="created_at", example="2020-01-01 00:00:00"
+    )
+    updated_at: datetime = Field(
+        default=None, description="updated_at", example="2020-01-01 00:00:00"
+    )
 
 
 class ListResponseDto(CustomPydanticBaseModel):

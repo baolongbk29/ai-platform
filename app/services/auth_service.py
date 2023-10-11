@@ -2,7 +2,12 @@ from datetime import timedelta
 
 from app.core.config import configs
 from app.core.exception import AuthError
-from app.core.security import create_access_token, create_refresh_token, get_password_hash, verify_password
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    get_password_hash,
+    verify_password,
+)
 from app.models.user import AuthDto, User, UserDto
 from app.repositories.user_repository import UserRepository
 from app.services.base_service import BaseService
@@ -15,8 +20,12 @@ class AuthService(BaseService):
         super().__init__(user_repository)
 
     async def build_jwt_payload(self, payload: AuthDto.Payload) -> AuthDto.JWTPayload:
-        access_token = create_access_token(payload, timedelta(seconds=configs.JWT_ACCESS_EXPIRE))
-        refresh_token = create_refresh_token(payload, timedelta(seconds=configs.JWT_REFRESH_EXPIRE))
+        access_token = create_access_token(
+            payload, timedelta(seconds=configs.JWT_ACCESS_EXPIRE)
+        )
+        refresh_token = create_refresh_token(
+            payload, timedelta(seconds=configs.JWT_REFRESH_EXPIRE)
+        )
         return AuthDto.JWTPayload(
             access_token=access_token["access_token"],
             refresh_token=refresh_token["refresh_token"],
@@ -50,7 +59,13 @@ class AuthService(BaseService):
         payload = AuthDto.Payload(**created_user.dict())
         return await self.build_jwt_payload(payload)
 
-    async def change_password(self, old_password: str, new_password: str, new_password_confirm: str, user_token: str):
+    async def change_password(
+        self,
+        old_password: str,
+        new_password: str,
+        new_password_confirm: str,
+        user_token: str,
+    ):
         found_user = await self.user_repository.select_user_by_user_token(user_token)
         if not found_user:
             raise AuthError(detail="User not found")

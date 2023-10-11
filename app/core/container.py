@@ -13,14 +13,22 @@ class Container(containers.DeclarativeContainer):
             "app.api.v1.endpoints.user",
         ]
     )
-    db = providers.Singleton(Database, db_url=configs.DB_URL, sync_db_url=configs.SYNC_DB_URL)
+    db = providers.Singleton(
+        Database, db_url=configs.DB_URL, sync_db_url=configs.SYNC_DB_URL
+    )
 
     # Base repositories
-    user_repository = providers.Factory(repositories.UserRepository, session_factory=db.provided.session_factory)
+    user_repository = providers.Factory(
+        repositories.UserRepository, session_factory=db.provided.session_factory
+    )
 
     # Base services
-    auth_service = providers.Factory(services.AuthService, user_repository=user_repository)
-    user_service = providers.Factory(services.UserService, user_repository=user_repository)
+    auth_service = providers.Factory(
+        services.AuthService, user_repository=user_repository
+    )
+    user_service = providers.Factory(
+        services.UserService, user_repository=user_repository
+    )
 
     # # Integrated services
     # cms_integrated_service = providers.Factory(

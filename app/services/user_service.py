@@ -14,7 +14,9 @@ class UserService(BaseService):
     async def get_user_by_user_token(self, user_token: str):
         return await self.user_repository.select_user_by_user_token(user_token)
 
-    async def patch_user_profile_after_check_user_token(self, user_upsert: UserDto.Upsert, user_token: str):
+    async def patch_user_profile_after_check_user_token(
+        self, user_upsert: UserDto.Upsert, user_token: str
+    ):
         found_user = await self.user_repository.select_user_by_user_token(user_token)
         if not found_user:
             raise Exception("User not found")

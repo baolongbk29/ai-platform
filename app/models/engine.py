@@ -24,11 +24,10 @@ class MlResult(BaseModel):
     detection_result: list = None
     detection_draw_url: str = None
     error: Optional[str] = None
-    
-    
+
+
 class MlResponse(BaseModel):
     status: str = "PENDING"
     status_code: int
     time: datetime
     task_id: str
-    

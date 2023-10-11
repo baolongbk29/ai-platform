@@ -15,7 +15,9 @@ async def get_current_user_token(
     bearer_token: str = Depends(JWTBearer(auto_error=False)),
 ) -> str:
     try:
-        decoded = jwt.decode(bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM)
+        decoded = jwt.decode(
+            bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM
+        )
         payload = AuthDto.Payload(**decoded)
     except (jwt.JWTError, ValidationError, AttributeError) as e:
         raise AuthError(detail="Could not validate credentials") from e
@@ -26,7 +28,9 @@ async def get_current_user_payload(
     bearer_token: str = Depends(JWTBearer(auto_error=False)),
 ) -> AuthDto.Payload:
     try:
-        decoded = jwt.decode(bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM)
+        decoded = jwt.decode(
+            bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM
+        )
         payload = AuthDto.Payload(**decoded)
     except (jwt.JWTError, ValidationError, AttributeError) as e:
         raise AuthError(detail="Could not validate credentials") from e
@@ -38,7 +42,9 @@ async def get_current_active_user_token(
     user_token: str = Depends(get_current_user_token),
     user_service: UserService = Depends(Provide[Container.user_service]),
 ) -> str:
-    current_user: User = await user_service.get_user_by_user_token(user_token=user_token)
+    current_user: User = await user_service.get_user_by_user_token(
+        user_token=user_token
+    )
     if not current_user:
         raise AuthError(detail="User not found")
     current_user.password = "***"
@@ -51,7 +57,9 @@ async def get_current_user_token_no_exception(
     bearer_token: str = Depends(JWTBearer(auto_error=False)),
 ) -> str:
     try:
-        decoded = jwt.decode(bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM)
+        decoded = jwt.decode(
+            bearer_token, configs.JWT_SECRET_KEY, algorithms=configs.JWT_ALGORITHM
+        )
         payload = AuthDto.Payload(**decoded)
     except (jwt.JWTError, ValidationError, AttributeError):
         return ""
@@ -63,7 +71,9 @@ async def get_current_super_user(
     user_token: str = Depends(get_current_user_token),
     user_service: UserService = Depends(Provide[Container.user_service]),
 ) -> User:
-    current_user: User = await user_service.get_user_by_user_token(user_token=user_token)
+    current_user: User = await user_service.get_user_by_user_token(
+        user_token=user_token
+    )
     if not current_user:
         raise AuthError("User not found")
     if not current_user.is_active:

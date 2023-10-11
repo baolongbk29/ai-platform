@@ -26,16 +26,22 @@ class BaseRepository:
             query_result = await session.execute(query)
             found_model = query_result.scalar()
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             return found_model
 
     async def select_by_id_after_check_is_deleted(self, model_id: int):
         async with self.session_factory() as session:
-            query = select(self._model).where(self._model.id == model_id, self._model.is_deleted == False)
+            query = select(self._model).where(
+                self._model.id == model_id, self._model.is_deleted == False
+            )
             query_result = await session.execute(query)
             found_model = query_result.scalar()
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             return found_model
 
     async def select_by_ids(self, model_ids: list[int]):
@@ -75,11 +81,15 @@ class BaseRepository:
                 return await self.insert(dto)
             return self.update(model_id=model_id, dto=dto)
 
-    async def update_after_check_user_token(self, model_id: int, dto: BaseModel, user_token: str):
+    async def update_after_check_user_token(
+        self, model_id: int, dto: BaseModel, user_token: str
+    ):
         async with self.session_factory() as session:
             found_model = await self.select_by_id(model_id)
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             if found_model.user_token != user_token:
                 raise ForbiddenError(
                     detail=f"not found update permission: {self._model_name}, requested id: {model_id}"
@@ -96,7 +106,9 @@ class BaseRepository:
         async with self.session_factory() as session:
             found_model = await self.select_by_id(model_id)
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             await session.delete(found_model)
             await session.commit()
 
@@ -104,7 +116,9 @@ class BaseRepository:
         async with self.session_factory() as session:
             found_model = await self.select_by_id(model_id)
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             if found_model.user_token != user_token:
                 raise ForbiddenError(
                     detail=f"not found delete permission: {self._model_name}, requested id: {model_id}"
@@ -112,11 +126,15 @@ class BaseRepository:
             await session.delete(found_model)
             await session.commit()
 
-    async def soft_delete_by_id_after_check_user_token(self, model_id: int, user_token: str):
+    async def soft_delete_by_id_after_check_user_token(
+        self, model_id: int, user_token: str
+    ):
         async with self.session_factory() as session:
             found_model = await self.select_by_id(model_id)
             if not found_model:
-                raise NotFoundError(detail=f"not found model name: {self._model_name}, requested id: {model_id}")
+                raise NotFoundError(
+                    detail=f"not found model name: {self._model_name}, requested id: {model_id}"
+                )
             if found_model.user_token != user_token:
                 raise ForbiddenError(
                     detail=f"not found delete permission: {self._model_name}, requested id: {model_id}"

@@ -9,11 +9,15 @@ from app.services.user_service import UserService
 
 router = APIRouter(
     prefix="/user",
-    tags=["user"],
+    tags=["User"],
 )
 
 
-@router.post("/change-password", response_model=AuthDto.JWTPayload, status_code=status.HTTP_200_OK)
+@router.post(
+    "/change-password",
+    response_model=AuthDto.JWTPayload,
+    status_code=status.HTTP_200_OK,
+)
 @inject
 async def change_password(
     old_password: str = Body(..., description="Old password"),
@@ -38,4 +42,6 @@ async def change_profile(
     user_service: UserService = Depends(Provide[Container.user_service]),
     user_token: str = Depends(get_current_active_user_token),
 ):
-    return await user_service.patch_user_profile_after_check_user_token(self_updatable_attributes, user_token)
+    return await user_service.patch_user_profile_after_check_user_token(
+        self_updatable_attributes, user_token
+    )

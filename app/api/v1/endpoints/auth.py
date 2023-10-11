@@ -2,18 +2,24 @@ from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, status
 
 from app.core.container import Container
-from app.core.dependency import get_current_active_user_token, get_current_user_payload, get_current_user_token
+from app.core.dependency import (
+    get_current_active_user_token,
+    get_current_user_payload,
+    get_current_user_token,
+)
 from app.models.user import AuthDto, User, UserDto
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
 
 router = APIRouter(
     prefix="/auth",
-    tags=["auth"],
+    tags=["Auth"],
 )
 
 
-@router.post("/signin", response_model=AuthDto.JWTPayload, status_code=status.HTTP_200_OK)
+@router.post(
+    "/signin", response_model=AuthDto.JWTPayload, status_code=status.HTTP_200_OK
+)
 @inject
 async def sign_in(
     user_info: AuthDto.SignIn,
@@ -23,7 +29,9 @@ async def sign_in(
     return await auth_service.sign_in(user_info)
 
 
-@router.post("/signup", response_model=AuthDto.JWTPayload, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/signup", response_model=AuthDto.JWTPayload, status_code=status.HTTP_201_CREATED
+)
 @inject
 async def sign_up(
     user_info: AuthDto.SignUp,
@@ -46,7 +54,9 @@ async def get_me(
     return user_dto
 
 
-@router.post("/refresh", response_model=AuthDto.JWTPayload, status_code=status.HTTP_200_OK)
+@router.post(
+    "/refresh", response_model=AuthDto.JWTPayload, status_code=status.HTTP_200_OK
+)
 @inject
 async def refresh(
     # It must be take refresh_token from headers.

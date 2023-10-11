@@ -38,7 +38,10 @@ def create_app():
         request: Request,  # Don't remove it because it is used internally.
         exc: CustomHttpException,
     ) -> JSONResponse:
-        return JSONResponse(status_code=exc.status_code, content={"title": exc.title, "description": exc.description})
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"title": exc.title, "description": exc.description},
+        )
 
     # set routes
     @_app.get(f"{configs.API_PREFIX}/healthcheck", status_code=status.HTTP_200_OK)
